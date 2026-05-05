@@ -11,17 +11,31 @@ Item* gerarItensAleatorios(int m, int W_max, int V_max) {
 
     for(int i = 0; i < m; i++) {
         itens[i].id = i + 1; 
-        itens[i].peso = (rand() % (W_max/10)) + 1;
-        itens[i].volume = (rand() % (V_max/5)) + 1;
 
-        //Cria um tamanho base (uma média de impacto na mochila)
-        int tamanho_base = (itens[i].peso + itens[i].volume);
+        if((rand() % 100) < 5)
+        {
 
-        //Cria um ruído aleatório (variação de -10% até 20% do valor)
-        int variacao_maxima = tamanho_base * 0.3; 
-        int ruido = (rand() % (variacao_maxima + 1)) - (variacao_maxima / 3);
-        // Lucro proporcional ao tamanho + uma variação de até 200
-        itens[i].lucro = tamanho_base + ruido;
+            //Itens de Ouro: peso e volume baixo (entre 1% e 2% da capacidade total)
+            itens[i].peso = (rand() % (W_max / 50)) + 1; 
+            itens[i].volume = (rand() % (V_max/ 50)) + 1;
+
+            // Lucro muito alto
+            itens[i].lucro = (rand() % 500) + 1000; 
+        }
+        else
+        {
+            itens[i].peso = (rand() % (W_max/10)) + 1;
+            itens[i].volume = (rand() % (V_max/5)) + 1;
+
+            //Cria um tamanho base (uma média de impacto na mochila)
+            int tamanho_base = (itens[i].peso + itens[i].volume);
+
+            //Cria um ruído aleatório (variação de -10% até 20% do valor)
+            int variacao_maxima = tamanho_base * 0.3; 
+            int ruido = (rand() % (variacao_maxima + 1)) - (variacao_maxima / 3);
+            // Lucro proporcional ao tamanho + uma variação de até 200
+            itens[i].lucro = tamanho_base + ruido;
+        }
         
         if(itens[i].lucro <= 0)
         {
