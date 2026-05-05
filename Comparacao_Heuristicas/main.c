@@ -42,12 +42,20 @@ int main()
         int volumeGuloso = 0; 
         int lucroGuloso = 0; 
         double tempoGuloso = 0; 
-        
+        int lucroGulosoSimples;
+        double tempoGulosoSimples;
+
+        //Guloso Simples
+        LARGE_INTEGER inicioGulosoSimples, fimGulosoSimples; 
+        QueryPerformanceCounter(&inicioGulosoSimples);
+        lucroGulosoSimples = resolverGulosaSimples(itens, m, W_max, V_max, &pesoGuloso, &volumeGuloso);
+        QueryPerformanceCounter(&fimGulosoSimples);
+        tempoGulosoSimples = (double)(fimGulosoSimples.QuadPart - inicioGulosoSimples.QuadPart) / frequencia.QuadPart;
+
+        //Guloso Otimizado
         LARGE_INTEGER inicioGuloso, fimGuloso;
         QueryPerformanceCounter(&inicioGuloso);
-        
         lucroGuloso = resolverGulosa(itens, m, W_max, V_max, &pesoGuloso, &volumeGuloso);
-        
         QueryPerformanceCounter(&fimGuloso);
         tempoGuloso = (double)(fimGuloso.QuadPart - inicioGuloso.QuadPart) / frequencia.QuadPart;
 
@@ -92,8 +100,8 @@ int main()
                    lucroGuloso, tempoGuloso, 
                    lucroBL, tempoBL, 
                    lucroBLAleat, tempoAleat, tempoBLAleat, 
+                   lucroGulosoSimples, tempoGulosoSimples,
                    lucroOtimo);
-
         free(itens); // Libera memoria para a proxima instancia
     }
 

@@ -12,10 +12,43 @@ int comparar(const void *a, const void *b) {
     return 0; 
 }
 
+float calcularScoreSimples(Item item, int maxPeso, int maxVolume)
+{
+    return item.lucro / (item.peso + item.volume);
+}
+
 float calcularScore(Item item, int maxPeso, int maxVolume) {
     float alpha = 1.0 / maxPeso;
     float beta = 1.0 / maxVolume;
     return item.lucro / ((alpha * item.peso) + (beta * item.volume));
+}
+
+int resolverGulosaSimples(Item itens[], int n, int maxPeso, int maxVolume, int *pesoFinal, int *volumeFinal) {
+    int pesoAtual = 0;
+    int volumeAtual = 0;
+    int lucroTotal = 0; 
+
+    // Calcula o score de todos antes de ordenar
+    for(int i = 0; i < n; i++) {
+        itens[i].score = calcularScoreSimples(itens[i], maxPeso, maxVolume);
+        itens[i].selecionado = 0; // garante que a flag esta limpa
+    }
+
+    qsort(itens, n, sizeof(Item), comparar); 
+
+    for(int i = 0; i < n; i++) {
+        if((pesoAtual + itens[i].peso <= maxPeso) && (volumeAtual + itens[i].volume <= maxVolume)) {
+            pesoAtual += itens[i].peso;
+            volumeAtual += itens[i].volume;
+            lucroTotal += itens[i].lucro;
+            itens[i].selecionado = 1; 
+        }
+    }
+
+    *pesoFinal = pesoAtual; 
+    *volumeFinal = volumeAtual; 
+
+    return lucroTotal;
 }
 
 int resolverGulosa(Item itens[], int n, int maxPeso, int maxVolume, int *pesoFinal, int *volumeFinal) {
