@@ -27,7 +27,7 @@ int main()
         int lucroOtimo;
         char nome_arquivo[30];
         
-        sprintf(nome_arquivo, "instancia%d.txt", id);
+        sprintf(nome_arquivo, "C:/temp/Tarefa2_Final_Arthur/GeracaoInstancia/instancia%d.txt", id);
 
         Item *itens = lerInstancia(nome_arquivo, &m, &W_max, &V_max, &lucroOtimo);
         if (itens == NULL) {
