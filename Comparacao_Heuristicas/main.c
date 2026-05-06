@@ -3,7 +3,7 @@
 #include <time.h>
 
 // Evita conflito das funções max() e min() da windows.h com as suas
-#define NOMINMAX 
+#define NOMINMAX
 #include <windows.h>
 
 #include "item.h"
@@ -20,39 +20,54 @@ int main()
 
     printf("=== INICIANDO COMPARATIVO DAS 8 INSTANCIAS (ALTA PRECISAO) ===\n");
 
-    for (int id = 1; id <= 8; id++) {
+    for (int id = 1; id <= 8; id++)
+    {
         int W_max;
-        int V_max; 
-        int m; 
+        int V_max;
+        int m;
         int lucroOtimo;
         char nome_arquivo[30];
-        
+
         sprintf(nome_arquivo, "C:/temp/ProjetoAlg-MochilaGulosa/GeracaoInstancia/instancia%d.txt", id);
 
         Item *itens = lerInstancia(nome_arquivo, &m, &W_max, &V_max, &lucroOtimo);
-        if (itens == NULL) {
+        if (itens == NULL)
+        {
             printf("Aviso: Instancia %d nao encontrada. Pulando...\n", id);
-            continue; 
+            continue;
         }
+
+        // ==========================================
+        // Execução da Programação Dinâmica
+        // ==========================================
+        double tempoDP = 0;
+        int lucroDP = 0;
+        /*
+        LARGE_INTEGER inicioDP, fimDP;
+        QueryPerformanceCounter(&inicioDP);
+        lucroDP = resolverDP(itens, m, W_max, V_max);
+        QueryPerformanceCounter(&fimDP);
+        tempoDP = (double)(fimDP.QuadPart - inicioDP.QuadPart) / frequencia.QuadPart;
+        */
 
         // ==========================================
         // Execução da Heuristica Gulosa
         // ==========================================
-        int pesoGuloso = 0; 
-        int volumeGuloso = 0; 
-        int lucroGuloso = 0; 
-        double tempoGuloso = 0; 
+        int pesoGuloso = 0;
+        int volumeGuloso = 0;
+        int lucroGuloso = 0;
+        double tempoGuloso = 0;
         int lucroGulosoSimples;
         double tempoGulosoSimples;
 
-        //Guloso Simples
-        LARGE_INTEGER inicioGulosoSimples, fimGulosoSimples; 
+        // Guloso Simples
+        LARGE_INTEGER inicioGulosoSimples, fimGulosoSimples;
         QueryPerformanceCounter(&inicioGulosoSimples);
         lucroGulosoSimples = resolverGulosaSimples(itens, m, W_max, V_max, &pesoGuloso, &volumeGuloso);
         QueryPerformanceCounter(&fimGulosoSimples);
         tempoGulosoSimples = (double)(fimGulosoSimples.QuadPart - inicioGulosoSimples.QuadPart) / frequencia.QuadPart;
 
-        //Guloso Otimizado
+        // Guloso Otimizado
         LARGE_INTEGER inicioGuloso, fimGuloso;
         QueryPerformanceCounter(&inicioGuloso);
         lucroGuloso = resolverGulosa(itens, m, W_max, V_max, &pesoGuloso, &volumeGuloso);
@@ -63,11 +78,11 @@ int main()
         // Execução da Busca Local a partir do guloso
         // ==========================================
         LARGE_INTEGER inicioBL, fimBL;
-        QueryPerformanceCounter(&inicioBL); 
-        
+        QueryPerformanceCounter(&inicioBL);
+
         int lucroBL = aplicarBuscaLocal(itens, m, W_max, V_max, pesoGuloso, volumeGuloso, lucroGuloso);
-        
-        QueryPerformanceCounter(&fimBL); 
+
+        QueryPerformanceCounter(&fimBL);
         double tempoBL = (double)(fimBL.QuadPart - inicioBL.QuadPart) / frequencia.QuadPart;
 
         // ==========================================
@@ -75,7 +90,7 @@ int main()
         // ==========================================
         int pesoAleat = 0, volumeAleat = 0;
         LARGE_INTEGER inicioAleat, fimAleat;
-        
+
         QueryPerformanceCounter(&inicioAleat);
         int lucroAleatorio = resolverAleatorio(itens, m, W_max, V_max, &pesoAleat, &volumeAleat);
         QueryPerformanceCounter(&fimAleat);
@@ -83,24 +98,25 @@ int main()
         double tempoAleat = (double)(fimAleat.QuadPart - inicioAleat.QuadPart) / frequencia.QuadPart;
 
         // ==========================================
-        // Busca Local iniciada a partir da Solução Aleatória 
+        // Busca Local iniciada a partir da Solução Aleatória
         // ==========================================
         LARGE_INTEGER inicioBLAleat, fimBLAleat;
-        QueryPerformanceCounter(&inicioBLAleat); 
-        
+        QueryPerformanceCounter(&inicioBLAleat);
+
         int lucroBLAleat = aplicarBuscaLocal(itens, m, W_max, V_max, pesoAleat, volumeAleat, lucroAleatorio);
-        
-        QueryPerformanceCounter(&fimBLAleat); 
-        double tempoBLAleat = (double)(fimBLAleat.QuadPart - inicioBLAleat.QuadPart) / frequencia.QuadPart; 
+
+        QueryPerformanceCounter(&fimBLAleat);
+        double tempoBLAleat = (double)(fimBLAleat.QuadPart - inicioBLAleat.QuadPart) / frequencia.QuadPart;
 
         // ==========================================
         // Imprimindo com a sua funcao
         // ==========================================
         resultados(id, m, W_max, V_max,
-                   lucroGuloso, tempoGuloso, 
-                   lucroBL, tempoBL, 
-                   lucroBLAleat, tempoAleat, tempoBLAleat, 
+                   lucroGuloso, tempoGuloso,
+                   lucroBL, tempoBL,
+                   lucroBLAleat, tempoAleat, tempoBLAleat,
                    lucroGulosoSimples, tempoGulosoSimples,
+                   lucroDP, tempoDP,
                    lucroOtimo);
         free(itens); // Libera memoria para a proxima instancia
     }
