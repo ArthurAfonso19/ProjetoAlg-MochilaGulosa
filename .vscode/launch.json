@@ -8,8 +8,13 @@
       "args": [],
       "stopAtEntry": false,
       "externalConsole": true,
+<<<<<<< HEAD
       "cwd": "c:/temp/Tarefa2_Final_Arthur/Comparacao_Heuristicas",
       "program": "c:/temp/Tarefa2_Final_Arthur/Comparacao_Heuristicas/build/Debug/outDebug",
+=======
+      "cwd": "c:/temp/Tarefa2_Final_Arthur/GeracaoInstancia",
+      "program": "c:/temp/Tarefa2_Final_Arthur/GeracaoInstancia/build/Debug/outDebug",
+>>>>>>> dev
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [

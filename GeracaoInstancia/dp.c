@@ -3,6 +3,9 @@
 #include <stdint.h>
 #include "dp.h"
 
+typedef struct Estado{
+    int w; 
+};
 
 int max(int a, int b) {
     return (a > b) ? a : b;
@@ -10,7 +13,6 @@ int max(int a, int b) {
 
 int resolverDP(Item itens[], int num_itens, int W_max, int V_max) {
     
-    // Alterado de uint16_t para int.
     int (*dp)[V_max + 1] = calloc(W_max + 1, sizeof(*dp));
     
     if (dp == NULL) {
