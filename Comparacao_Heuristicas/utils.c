@@ -64,10 +64,10 @@ void resultados(int id_instancia, int m, int W_max, int V_max,
     printf("%-22s | %-10s | %-15s\n", "METODO (ESTRATEGIA)", "LUCRO", "TEMPO TOTAL (s)");
     printf("-----------------------------------------------------------------\n");
     //printf("%-22s | %-10d | %-15.9f\n", "Prog Dinamica", lucroDP, tempoDP);
-    printf("%-22s | %-10d | %-15.9f\n", "Guloso puro simples", lucroGulosoSimples, tempoGulosoSimples);
-    printf("%-22s | %-10d | %-15.9f\n", "Guloso puro", lucroGuloso, tempoGuloso);
-    printf("%-22s | %-10d | %-15.9f\n", "Guloso + BL", lucroBL, tempoTotal_GulosoBL);
-    printf("%-22s | %-10d | %-15.9f\n", "Aleatorio + BL", lucroBLAleat, tempoTotal_AleatBL);
+    printf("%-22s | %-10d | %-15.6f\n", "Guloso puro simples", lucroGulosoSimples, tempoGulosoSimples);
+    printf("%-22s | %-10d | %-15.6f\n", "Guloso puro", lucroGuloso, tempoGuloso);
+    printf("%-22s | %-10d | %-15.6f\n", "Guloso + BL", lucroBL, tempoTotal_GulosoBL);
+    printf("%-22s | %-10d | %-15.6f\n", "Aleatorio + BL", lucroBLAleat, tempoTotal_AleatBL);
     printf("-----------------------------------------------------------------\n");
 
     // Sua matemática de gap percentual intacta
