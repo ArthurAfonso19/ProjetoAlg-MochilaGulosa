@@ -32,6 +32,12 @@ def ler_instancia(caminho_arquivo):
     colunas = ['id', 'peso', 'volume', 'lucro']
     df_itens = pd.DataFrame(dados_itens, columns=colunas)
 
+    df_itens['score_simples'] = df_itens['lucro'] / (df_itens['peso'] + df_itens['volume'])
+
+    alpha = 1.0 / w_max
+    beta = 1.0 / v_max
+    df_itens['score_otimizado'] = df_itens['lucro'] / (alpha * df_itens['peso'] + beta * df_itens['volume'])
+
     id_id = "".join(filter(str.isdigit, os.path.basename(caminho_arquivo)))
 
     return Instancia(id_id, m, w_max, v_max, lucro_otimo, df_itens)
