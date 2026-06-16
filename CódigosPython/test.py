@@ -38,7 +38,7 @@ def ler_instancia(caminho_arquivo):
 
 
 lista_instancias = []
-diretorio = "C:/temp/Tarefa2_Final_Arthur/GeracaoInstancia"
+diretorio = "C:/temp/ProjetoAlg-MochilaGulosa/GeracaoInstancia"
 
 for i in range(1, 9):
     nome_arq = f"instancia{i}.txt"
