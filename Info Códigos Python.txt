@@ -1,0 +1,3 @@
+- Comecei a desenvolver um script em python para fazer uma análise das instâncias/dados criado. 
+
+- A ideia é fazer a leitura das instâncias e criar uma lista de dataframes pandas, para assim fazer análises da qualidade das instâncias. 
