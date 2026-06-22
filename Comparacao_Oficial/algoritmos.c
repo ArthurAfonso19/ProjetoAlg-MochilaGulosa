@@ -327,4 +327,8 @@ int resolverGRASP(Item itens[], int n, int maxPeso, int maxVolume,
             itens, n, maxPeso, maxVolume, pesoAtual, volumeAtual, lucroConstrucao
         );
     }
+
+    *pesoFinal = melhorPeso;
+    *volumeFinal = melhorVolume;
+    return melhorLucro;
 }
