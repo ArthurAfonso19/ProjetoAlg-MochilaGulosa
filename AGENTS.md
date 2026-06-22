@@ -16,9 +16,15 @@ cd GeracaoInstancia && make
 # Run heuristic comparisons
 cd Comparacao_Heuristicas && make
 # Output: simulador.exe
+
+# Run comparisons over the official benchmark instances
+cd Comparacao_Oficial && make
+# Output: simulador_oficial.exe
+# NOTE: must be executed from inside Comparacao_Oficial/ (uses relative path
+# ../Instancias de Teste/Teste%d.txt). On Windows run: simulador_oficial.exe
 ```
 
-**Optimization flags differ by intent**: `GeracaoInstancia` compiles with `-O3` (DP must finish fast), while `Comparacao_Heuristicas` compiles with `-O0` (timing comparisons must be fair and unspecialized).
+**Optimization flags differ by intent**: `GeracaoInstancia` compiles with `-O3` (DP must finish fast), while `Comparacao_Heuristicas` and `Comparacao_Oficial` compile with `-O0` (timing comparisons must be fair and unspecialized). If `make` is not on PATH, build with: `gcc -Wall -O0 main.c algoritmos.c utils.c -o simulador_oficial.exe`.
 
 ## Known Issues
 
@@ -30,9 +36,15 @@ cd Comparacao_Heuristicas && make
 
 - `GeracaoInstancia/` — Generates 8 benchmark instances (`instancia1.txt`–`instancia8.txt`) with random items and solves each with DP to write the optimal profit. Entry: `main.c` → `gerador.c` + `dp.c`.
 - `Comparacao_Heuristicas/` — Reads those instance files and benchmarks four methods: greedy-simple, greedy-optimized, greedy+local-search, random+local-search. Uses `QueryPerformanceCounter` (Windows API) for high-precision timing. Entry: `main.c` → `algoritmos.c` + `utils.c`.
+- `Comparacao_Oficial/` — Same four heuristics, but over the official benchmark instances in `Instancias de Teste/`. There is no precomputed optimum, so DP is run live as the baseline. Each method operates on its own `memcpy` of the pristine instance to avoid cross-contamination from `qsort`/`selecionado` state. Entry: `main.c` → `algoritmos.c` + `utils.c`.
+- `Instancias de Teste/` — Official benchmark instances (`Teste1.txt`–`Teste8.txt`) in a different format (see below).
 - `CódigosPython/test.py` — Reads instance files with pandas for inspection. Uses the `.venv` Python 3.10 venv (numpy + pandas installed).
 
 ## Instance File Format
+
+Two distinct formats exist in this repo:
+
+### `GeracaoInstancia/instancia*.txt` and `Comparacao_Heuristicas/instancia*.txt`
 
 ```
 m W_max V_max
@@ -42,3 +54,14 @@ lucro_otimo
 ```
 
 First line = header, next m lines = items, last line = DP optimal profit.
+
+### `Instancias de Teste/Teste*.txt` (official benchmark, used by `Comparacao_Oficial`)
+
+```
+dim m
+<lucro_1> ... <lucro_m>          (token stream, m values, line breaks ignored)
+W_max V_max
+<p_1> <v_1> ... <p_m> <v_m>      (token stream, m (peso, volume) pairs)
+```
+
+First line = dimensionality (`2` = weight+volume) + item count. Next m tokens = profits. Then capacities. Then m weight/volume pairs. No precomputed optimum; DP is run live.
