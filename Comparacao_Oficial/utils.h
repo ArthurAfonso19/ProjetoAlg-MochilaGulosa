@@ -14,6 +14,7 @@ void resultados(int id_instancia, int m, int W_max, int V_max,
                int lucroGuloso, double tempoGuloso,
                int lucroBL, double tempoBL,
                int lucroBLAleat, double tempoAleat, double tempoBLAleat,
+               int lucroGRASP, double tempoGRASP,
                int lucroDP, double tempoDP);
 
 #endif

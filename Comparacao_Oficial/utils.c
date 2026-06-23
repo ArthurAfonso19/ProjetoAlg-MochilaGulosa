@@ -97,6 +97,7 @@ void resultados(int id_instancia, int m, int W_max, int V_max,
                 int lucroGuloso, double tempoGuloso,
                 int lucroBL, double tempoBL,
                 int lucroBLAleat, double tempoAleat, double tempoBLAleat,
+                int lucroGRASP, double tempoGRASP,
                 int lucroDP, double tempoDP)
 {
     double tempoTotal_GulosoBL = tempoGuloso + tempoBL;
@@ -112,17 +113,20 @@ void resultados(int id_instancia, int m, int W_max, int V_max,
     printf("%-22s | %-10d | %-15.6f\n", "Guloso puro", lucroGuloso, tempoGuloso);
     printf("%-22s | %-10d | %-15.6f\n", "Guloso + BL", lucroBL, tempoTotal_GulosoBL);
     printf("%-22s | %-10d | %-15.6f\n", "Aleatorio + BL", lucroBLAleat, tempoTotal_AleatBL);
+    printf("%-22s | %-10d | %-15.6f\n", "GRASP", lucroGRASP, tempoGRASP);
     printf("-----------------------------------------------------------------\n");
 
     float gapGulosoSimples = ((float)(lucroDP - lucroGulosoSimples) / lucroDP) * 100;
     float gapGuloso = ((float)(lucroDP - lucroGuloso) / lucroDP) * 100;
     float gapBL = ((float)(lucroDP - lucroBL) / lucroDP) * 100;
     float gapBLAleat = ((float)(lucroDP - lucroBLAleat) / lucroDP) * 100;
+    float gapGRASP = ((float)(lucroDP - lucroGRASP) / lucroDP) * 100;
 
     printf("QUALIDADE (%% DO OTIMO DP):\n");
     printf("- Guloso simples   : %6.2f%%\n", 100.0 - gapGulosoSimples);
     printf("- Guloso otimizado : %6.2f%%\n", 100.0 - gapGuloso);
     printf("- Guloso + BL      : %6.2f%%\n", 100.0 - gapBL);
     printf("- Aleatorio + BL   : %6.2f%%\n", 100.0 - gapBLAleat);
+    printf("- GRASP            : %6.2f%%\n", 100.0 - gapGRASP);
     printf("=================================================================\n");
 }

@@ -105,6 +105,25 @@ int main()
         double tempoBLAleat = (double)(fimBLA.QuadPart - inicioBLA.QuadPart) / frequencia.QuadPart;
 
         // ==========================================
+        // GRASP
+        // ==========================================
+        int pesoGRASP = 0, volumeGRASP = 0;
+        float alphaGRASP = 0.20f;
+        int iteracoesGRASP = 30; 
+
+        memcpy(itens, itensOriginal, m * sizeof(Item));
+        LARGE_INTEGER inicioGRASP, fimGRASP; 
+        QueryPerformanceCounter(&inicioGRASP);
+        int lucroGRASP = resolverGRASP(
+            itens, m, W_max, V_max,
+            alphaGRASP, iteracoesGRASP,
+            &pesoGRASP, &volumeGRASP
+        );
+        QueryPerformanceCounter(&fimGRASP);
+
+        double tempoGRASP = (double)(fimGRASP.QuadPart - inicioGRASP.QuadPart) / frequencia.QuadPart;
+
+        // ==========================================
         // Imprimindo comparativo
         // ==========================================
         resultados(id, m, W_max, V_max,
@@ -112,6 +131,7 @@ int main()
                    lucroGuloso, tempoGuloso,
                    lucroBL, tempoBL,
                    lucroBLAleat, tempoAleat, tempoBLAleat,
+                   lucroGRASP, tempoGRASP,
                    lucroDP, tempoDP);
 
         free(itens);

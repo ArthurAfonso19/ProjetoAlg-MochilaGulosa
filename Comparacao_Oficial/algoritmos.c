@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <string.h>
 #include "algoritmos.h"
 #include "utils.h"
 
@@ -24,7 +25,15 @@ float calcularScore(Item item, int maxPeso, int maxVolume)
 {
     float alpha = 1.0f / maxPeso;
     float beta = 1.0f / maxVolume;
-    return item.lucro / ((alpha * item.peso) + (beta * item.volume));
+    float custoNormalizado = (alpha * item.peso) + (beta * item.volume);
+
+    // Itens com peso e volume nulos devem ser muito atrativos, sem gerar inf/NaN.
+    if (custoNormalizado == 0.0f)
+    {
+        return (item.lucro > 0) ? 1.0e30f : 0.0f;
+    }
+
+    return item.lucro / custoNormalizado;
 }
 
 int resolverDP(Item itens[], int num_itens, int W_max, int V_max)
@@ -304,6 +313,22 @@ static int construirSolucaoGRASP(Item itens[], int n, int maxPeso, int maxVolume
     return lucroTotal;
 }
 
+static void recalcularMedidasSolucao(Item itens[], int n, int *pesoTotal, int *volumeTotal)
+{
+    *pesoTotal = 0;
+    *volumeTotal = 0;
+
+    //Recalcula peso e volume a partir do estado real da solução restaurada.
+    for (int i = 0; i < n; i++)
+    {
+        if(itens[i].selecionado)
+        {
+            *pesoTotal += itens[i].peso;
+            *volumeTotal += itens[i].volume;
+        }
+    }
+}
+
 //Primeira versão do GRASP completo usando multi-start 
 int resolverGRASP(Item itens[], int n, int maxPeso, int maxVolume,
                     float alphaGRASP, int interacoes,
@@ -312,6 +337,14 @@ int resolverGRASP(Item itens[], int n, int maxPeso, int maxVolume,
     int melhorLucro = 0;
     int melhorPeso = 0; 
     int melhorVolume = 0;
+    Item *melhorItens = malloc(n * sizeof(Item));
+
+    if(melhorItens == NULL)
+    {
+        *pesoFinal = 0;
+        *volumeFinal = 0;
+        return 0;
+    }
 
     for(int interacao = 0; interacao < interacoes; interacao++)
     {
@@ -323,10 +356,27 @@ int resolverGRASP(Item itens[], int n, int maxPeso, int maxVolume,
             itens, n, maxPeso, maxVolume, alphaGRASP, &pesoAtual, &volumeAtual
         );
 
+        //Refina a solução atual, podendo trocar itens e alterar a configração final.
         int lucroRefinado = aplicarBuscaLocal(
             itens, n, maxPeso, maxVolume, pesoAtual, volumeAtual, lucroConstrucao
         );
+
+        if(lucroRefinado > melhorLucro)
+        {
+            melhorLucro = lucroRefinado;
+
+            //Preserva a melhor configuração completa encontrada até aqui 
+            memcpy(melhorItens, itens, n * sizeof(Item));
+        }
     }
+
+    //Restaura o vetor principal a melhor configuração do GRASP
+    memcpy(itens, melhorItens, n * sizeof(Item));
+
+    //Recalcula peso e volume para garantir coerencia com a solução restaurada. 
+    recalcularMedidasSolucao(itens, n, &melhorPeso, &melhorVolume);
+
+    free(melhorItens); 
 
     *pesoFinal = melhorPeso;
     *volumeFinal = melhorVolume;
