@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <string.h>
 #include "algoritmos.h"
 #include "utils.h"
 
@@ -17,14 +18,30 @@ int comparar(const void *a, const void *b)
 
 float calcularScoreSimples(Item item, int maxPeso, int maxVolume)
 {
-    return item.lucro / (item.peso + item.volume);
+    int custo = item.peso + item.volume;
+
+    // Evita divisao por zero para itens com peso e volume nulos.
+    if (custo == 0)
+    {
+        return (item.lucro > 0) ? 1.0e30f : 0.0f;
+    }
+
+    return (float)item.lucro / custo;
 }
 
 float calcularScore(Item item, int maxPeso, int maxVolume)
 {
-    float alpha = 1.0 / maxPeso;
-    float beta = 1.0 / maxVolume;
-    return item.lucro / ((alpha * item.peso) + (beta * item.volume));
+    float alpha = 1.0f / maxPeso;
+    float beta = 1.0f / maxVolume;
+    float custoNormalizado = (alpha * item.peso) + (beta * item.volume);
+
+    // Mantem itens de custo nulo muito atrativos, sem gerar inf/NaN no GRASP.
+    if (custoNormalizado == 0.0f)
+    {
+        return (item.lucro > 0) ? 1.0e30f : 0.0f;
+    }
+
+    return item.lucro / custoNormalizado;
 }
 
 int resolverDP(Item itens[], int num_itens, int W_max, int V_max)
@@ -52,7 +69,6 @@ int resolverDP(Item itens[], int num_itens, int W_max, int V_max)
                 dp[w][v] = max(dp[w][v], dp[w - p][v - v_i] + l);
             }
         }
-        printf(" %d itens calculados!\n", i);
     }
 
     int resultado = dp[W_max][V_max];
@@ -205,4 +221,168 @@ int resolverAleatorio(Item itens[], int n, int maxPeso, int maxVolume, int *peso
     free(indices);
 
     return lucroTotal;
+}
+
+static void prepararItensGRASP(Item itens[], int n, int maxPeso, int maxVolume)
+{
+    for (int i = 0; i < n; i++)
+    {
+        // Reaproveita o mesmo score do guloso otimizado na fase construtiva.
+        itens[i].score = calcularScore(itens[i], maxPeso, maxVolume);
+        itens[i].selecionado = 0;
+    }
+}
+
+static int construirSolucaoGRASP(Item itens[], int n, int maxPeso, int maxVolume,
+                                 float alphaGRASP, int *pesoFinal, int *volumeFinal)
+{
+    int pesoAtual = 0;
+    int volumeAtual = 0;
+    int lucroTotal = 0;
+    int *rcl = malloc(n * sizeof(int));
+
+    if (rcl == NULL)
+    {
+        *pesoFinal = 0;
+        *volumeFinal = 0;
+        return 0;
+    }
+
+    prepararItensGRASP(itens, n, maxPeso, maxVolume);
+
+    while (1)
+    {
+        float melhorScore = -1.0f;
+        float piorScore = -1.0f;
+        int haCandidato = 0;
+
+        // Primeiro passo: localizar apenas candidatos viaveis.
+        for (int i = 0; i < n; i++)
+        {
+            if (itens[i].selecionado == 0 &&
+                pesoAtual + itens[i].peso <= maxPeso &&
+                volumeAtual + itens[i].volume <= maxVolume)
+            {
+                if (!haCandidato)
+                {
+                    melhorScore = itens[i].score;
+                    piorScore = itens[i].score;
+                    haCandidato = 1;
+                }
+                else
+                {
+                    if (itens[i].score > melhorScore)
+                    {
+                        melhorScore = itens[i].score;
+                    }
+                    if (itens[i].score < piorScore)
+                    {
+                        piorScore = itens[i].score;
+                    }
+                }
+            }
+        }
+
+        if (!haCandidato)
+        {
+            break;
+        }
+
+        float limiteRCL = melhorScore - alphaGRASP * (melhorScore - piorScore);
+        int tamanhoRCL = 0;
+
+        // Segundo passo: guardar na RCL apenas candidatos fortes.
+        for (int i = 0; i < n; i++)
+        {
+            if (itens[i].selecionado == 0 &&
+                pesoAtual + itens[i].peso <= maxPeso &&
+                volumeAtual + itens[i].volume <= maxVolume &&
+                itens[i].score >= limiteRCL)
+            {
+                rcl[tamanhoRCL] = i;
+                tamanhoRCL++;
+            }
+        }
+
+        if (tamanhoRCL == 0)
+        {
+            break;
+        }
+
+        // Escolha aleatoria dentro da lista restrita.
+        int escolhido = rcl[rand() % tamanhoRCL];
+        itens[escolhido].selecionado = 1;
+        pesoAtual += itens[escolhido].peso;
+        volumeAtual += itens[escolhido].volume;
+        lucroTotal += itens[escolhido].lucro;
+    }
+
+    free(rcl);
+    *pesoFinal = pesoAtual;
+    *volumeFinal = volumeAtual;
+    return lucroTotal;
+}
+
+static void recalcularMedidasSolucao(Item itens[], int n, int *pesoTotal, int *volumeTotal)
+{
+    *pesoTotal = 0;
+    *volumeTotal = 0;
+
+    // Reconstroi peso e volume a partir do estado real da melhor solucao restaurada.
+    for (int i = 0; i < n; i++)
+    {
+        if (itens[i].selecionado)
+        {
+            *pesoTotal += itens[i].peso;
+            *volumeTotal += itens[i].volume;
+        }
+    }
+}
+
+int resolverGRASP(Item itens[], int n, int maxPeso, int maxVolume,
+                  float alphaGRASP, int interacoes,
+                  int *pesoFinal, int *volumeFinal)
+{
+    int melhorLucro = 0;
+    int melhorPeso = 0;
+    int melhorVolume = 0;
+    Item *melhorItens = malloc(n * sizeof(Item));
+
+    if (melhorItens == NULL)
+    {
+        *pesoFinal = 0;
+        *volumeFinal = 0;
+        return 0;
+    }
+
+    for (int interacao = 0; interacao < interacoes; interacao++)
+    {
+        int pesoAtual = 0;
+        int volumeAtual = 0;
+
+        // Gera uma solucao inicial viavel e diversificada.
+        int lucroConstrucao = construirSolucaoGRASP(
+            itens, n, maxPeso, maxVolume, alphaGRASP, &pesoAtual, &volumeAtual);
+
+        // Refina a solucao corrente e preserva apenas a melhor iteracao.
+        int lucroRefinado = aplicarBuscaLocal(
+            itens, n, maxPeso, maxVolume, pesoAtual, volumeAtual, lucroConstrucao);
+
+        if (lucroRefinado > melhorLucro)
+        {
+            melhorLucro = lucroRefinado;
+            // Salva a configuracao completa da melhor solucao encontrada ate aqui.
+            memcpy(melhorItens, itens, n * sizeof(Item));
+        }
+    }
+
+    // Restaura no vetor principal exatamente a melhor configuracao do GRASP.
+    memcpy(itens, melhorItens, n * sizeof(Item));
+    recalcularMedidasSolucao(itens, n, &melhorPeso, &melhorVolume);
+
+    free(melhorItens);
+
+    *pesoFinal = melhorPeso;
+    *volumeFinal = melhorVolume;
+    return melhorLucro;
 }

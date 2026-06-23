@@ -11,4 +11,7 @@ int aplicarBuscaLocal(Item itens[], int n, int maxPeso, int maxVolume, int pesoI
 float calcularScoreSimples(Item item, int maxPeso, int maxVolume);
 int resolverGulosaSimples(Item itens[], int n, int maxPeso, int maxVolume, int *pesoFinal, int *volumeFinal);
 int resolverDP(Item itens[], int num_itens, int W_max, int V_max);
+int resolverGRASP(Item itens[], int n, int maxPeso, int maxVolume,
+                  float alphaGRASP, int interacoes,
+                  int *pesoFinal, int *volumeFinal);
 #endif
