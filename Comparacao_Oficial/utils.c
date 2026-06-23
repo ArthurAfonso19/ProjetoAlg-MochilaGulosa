@@ -102,6 +102,11 @@ void resultados(int id_instancia, int m, int W_max, int V_max,
 {
     double tempoTotal_GulosoBL = tempoGuloso + tempoBL;
     double tempoTotal_AleatBL = tempoAleat + tempoBLAleat;
+    double speedupGulosoSimples = (tempoGulosoSimples > 0.0) ? (tempoDP / tempoGulosoSimples) : 0.0;
+    double speedupGuloso = (tempoGuloso > 0.0) ? (tempoDP / tempoGuloso) : 0.0;
+    double speedupBL = (tempoTotal_GulosoBL > 0.0) ? (tempoDP / tempoTotal_GulosoBL) : 0.0;
+    double speedupBLAleat = (tempoTotal_AleatBL > 0.0) ? (tempoDP / tempoTotal_AleatBL) : 0.0;
+    double speedupGRASP = (tempoGRASP > 0.0) ? (tempoDP / tempoGRASP) : 0.0;
 
     printf("\n=================================================================\n");
     printf("INSTANCIA %d (Itens: %d | W: %d | V: %d | OTIMO(DP): %d)\n", id_instancia, m, W_max, V_max, lucroDP);
@@ -128,5 +133,11 @@ void resultados(int id_instancia, int m, int W_max, int V_max,
     printf("- Guloso + BL      : %6.2f%%\n", 100.0 - gapBL);
     printf("- Aleatorio + BL   : %6.2f%%\n", 100.0 - gapBLAleat);
     printf("- GRASP            : %6.2f%%\n", 100.0 - gapGRASP);
+    printf("SPEEDUP (BASELINE = DP):\n");
+    printf("- Guloso simples   : %8.2fx\n", speedupGulosoSimples);
+    printf("- Guloso otimizado : %8.2fx\n", speedupGuloso);
+    printf("- Guloso + BL      : %8.2fx\n", speedupBL);
+    printf("- Aleatorio + BL   : %8.2fx\n", speedupBLAleat);
+    printf("- GRASP            : %8.2fx\n", speedupGRASP);
     printf("=================================================================\n");
 }
