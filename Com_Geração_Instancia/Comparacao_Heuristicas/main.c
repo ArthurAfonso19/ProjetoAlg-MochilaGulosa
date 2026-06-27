@@ -27,12 +27,13 @@ int main()
         int V_max;
         int m;
         int lucroOtimo;
+        double tempoDP;
         char nome_arquivo[256];
 
         // Usa o diretorio vizinho GeracaoInstancia para carregar as instancias geradas.
         sprintf(nome_arquivo, "../GeracaoInstancia/instancia%d.txt", id);
 
-        Item *itensOriginal = lerInstancia(nome_arquivo, &m, &W_max, &V_max, &lucroOtimo);
+        Item *itensOriginal = lerInstancia(nome_arquivo, &m, &W_max, &V_max, &lucroOtimo, &tempoDP);
         if (itensOriginal == NULL)
         {
             printf("Aviso: Instancia %d nao encontrada. Pulando...\n", id);
@@ -47,17 +48,6 @@ int main()
             free(itensOriginal);
             continue;
         }
-
-        // ==========================================
-        // Execução da Programação Dinâmica
-        // ==========================================
-        int lucroDP = 0;
-        LARGE_INTEGER inicioDP, fimDP;
-        memcpy(itens, itensOriginal, m * sizeof(Item));
-        QueryPerformanceCounter(&inicioDP);
-        lucroDP = resolverDP(itens, m, W_max, V_max);
-        QueryPerformanceCounter(&fimDP);
-        double tempoDP = (double)(fimDP.QuadPart - inicioDP.QuadPart) / frequencia.QuadPart;
 
         int pesoGuloso = 0;
         int volumeGuloso = 0;
@@ -153,8 +143,7 @@ int main()
                    lucroBLAleat, tempoAleat, tempoBLAleat,
                    lucroGRASP, tempoGRASP,
                    lucroGulosoSimples, tempoGulosoSimples,
-                   lucroDP, tempoDP,
-                   lucroOtimo);
+                   lucroOtimo, tempoDP);
 
         free(itens); // Libera memoria para a proxima instancia
         free(itensOriginal);

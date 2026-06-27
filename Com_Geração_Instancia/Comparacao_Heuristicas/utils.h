@@ -8,7 +8,7 @@ int max(int a, int b);
 void embaralhar(int *vetor, int n);
 
 // Nova função para ler os dados do arquivo gerado
-Item* lerInstancia(const char* nomeArquivo, int *m, int *W_max, int *V_max, int *lucroOtimo);
+Item* lerInstancia(const char* nomeArquivo, int *m, int *W_max, int *V_max, int *lucroOtimo, double *tempoDP);
 
 // Sua função adaptada
 void resultados(int id_instancia, int m, int W_max, int V_max,
@@ -17,7 +17,6 @@ void resultados(int id_instancia, int m, int W_max, int V_max,
                 int lucroBLAleat, double tempoAleat, double tempoBLAleat,
                 int lucroGRASP, double tempoGRASP,
                 int lucroGulosoSimples, double tempoGulosoSimples,
-                int lucroDP, double tempoDP,
-                int lucroOtimo);
+                int lucroOtimo, double tempoDP);
 
 #endif

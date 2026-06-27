@@ -49,7 +49,7 @@ Item* gerarItensAleatorios(int m, int W_max, int V_max) {
     return itens; 
 }
 
-void salvarInstanciaCompleta(const char* nomeArquivo, Item* itens, int m, int W_max, int V_max, int lucro_otimo) {
+void salvarInstanciaCompleta(const char* nomeArquivo, Item* itens, int m, int W_max, int V_max, int lucro_otimo, double tempo_dp) {
     FILE *arquivo = fopen(nomeArquivo, "w");
     if (arquivo == NULL) {
         printf("Erro ao criar o arquivo %s!\n", nomeArquivo);
@@ -64,8 +64,8 @@ void salvarInstanciaCompleta(const char* nomeArquivo, Item* itens, int m, int W_
         fprintf(arquivo, "%d %d %d %d\n", itens[i].id, itens[i].peso, itens[i].volume, itens[i].lucro);
     }
 
-    // Pula uma linha e escreve o resultado ótimo da DP no final
-    fprintf(arquivo, "\n%d\n", lucro_otimo);
+    // Salva o ótimo e o tempo da DP para evitar recalcular no comparador.
+    fprintf(arquivo, "\n%d\n%.6f\n", lucro_otimo, tempo_dp);
 
     fclose(arquivo);
 }

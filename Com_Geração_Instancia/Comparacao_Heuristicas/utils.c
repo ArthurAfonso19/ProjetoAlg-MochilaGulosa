@@ -18,7 +18,7 @@ void embaralhar(int *vetor, int n)
     }
 }
 
-Item *lerInstancia(const char *nomeArquivo, int *m, int *W_max, int *V_max, int *lucroOtimo)
+Item *lerInstancia(const char *nomeArquivo, int *m, int *W_max, int *V_max, int *lucroOtimo, double *tempoDP)
 {
     FILE *arquivo = fopen(nomeArquivo, "r");
     if (arquivo == NULL)
@@ -43,6 +43,11 @@ Item *lerInstancia(const char *nomeArquivo, int *m, int *W_max, int *V_max, int 
         *lucroOtimo = 0;
     }
 
+    if (fscanf(arquivo, "%lf", tempoDP) != 1)
+    {
+        *tempoDP = 0.0;
+    }
+
     fclose(arquivo);
     return itens;
 }
@@ -53,8 +58,7 @@ void resultados(int id_instancia, int m, int W_max, int V_max,
                 int lucroBLAleat, double tempoAleat, double tempoBLAleat,
                 int lucroGRASP, double tempoGRASP,
                 int lucroGulosoSimples, double tempoGulosoSimples,
-                int lucroDP, double tempoDP,
-                int lucroOtimo)
+                int lucroOtimo, double tempoDP)
 {
     // Para metodos compostos, o tempo total soma construcao e refinamento.
     double tempoTotal_GulosoBL = tempoGuloso + tempoBL;
@@ -72,7 +76,7 @@ void resultados(int id_instancia, int m, int W_max, int V_max,
     printf("=================================================================\n");
     printf("%-22s | %-10s | %-15s\n", "METODO (ESTRATEGIA)", "LUCRO", "TEMPO TOTAL (s)");
     printf("-----------------------------------------------------------------\n");
-    printf("%-22s | %-10d | %-15.6f\n", "Prog Dinamica", lucroDP, tempoDP);
+    printf("%-22s | %-10d | %-15.6f\n", "Prog Dinamica", lucroOtimo, tempoDP);
     printf("%-22s | %-10d | %-15.6f\n", "Guloso puro simples", lucroGulosoSimples, tempoGulosoSimples);
     printf("%-22s | %-10d | %-15.6f\n", "Guloso puro", lucroGuloso, tempoGuloso);
     printf("%-22s | %-10d | %-15.6f\n", "Guloso + BL", lucroBL, tempoTotal_GulosoBL);

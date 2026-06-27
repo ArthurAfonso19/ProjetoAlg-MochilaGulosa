@@ -1,6 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+
+#define NOMINMAX
+#include <windows.h>
+
 #include "gerador.h"
 #include "dp.h"
 
@@ -12,6 +16,9 @@ typedef struct{
 
 int main() {
     srand(time(NULL));
+
+    LARGE_INTEGER frequencia;
+    QueryPerformanceFrequency(&frequencia);
 
     // Definição dos 8 casos de teste
     Config testes[8] = {
@@ -40,13 +47,17 @@ int main() {
         Item* itens = gerarItensAleatorios(testes[i].qtd, testes[i].W, testes[i].V);
 
         printf("      Resolvendo DP... (Aguarde, alocando memoria)\n");
+        LARGE_INTEGER inicioDP, fimDP;
+        QueryPerformanceCounter(&inicioDP);
         int lucro = resolverDP(itens, testes[i].qtd, testes[i].W, testes[i].V);
+        QueryPerformanceCounter(&fimDP);
+        double tempoDP = (double)(fimDP.QuadPart - inicioDP.QuadPart) / frequencia.QuadPart;
 
         if (lucro == -1) {
             printf("      ERRO: Memoria insuficiente para este teste!\n");
         } else {
-            salvarInstanciaCompleta(nome_arq, itens, testes[i].qtd, testes[i].W, testes[i].V, lucro);
-            printf("      Sucesso! Lucro: %d\n", lucro);
+            salvarInstanciaCompleta(nome_arq, itens, testes[i].qtd, testes[i].W, testes[i].V, lucro, tempoDP);
+            printf("      Sucesso! Lucro: %d | Tempo DP: %.6f s\n", lucro, tempoDP);
         }
 
         free(itens);
